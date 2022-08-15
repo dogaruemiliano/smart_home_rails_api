@@ -7,8 +7,7 @@ if Doorkeeper::Application.count.zero?
 
   app_names.each do |app_name|
     puts "\tCreating App for #{app_name}"
-    app = Doorkeeper::Application.create!(name: app_name, confidential: false,
-                                          redirect_uri: 'urn:ietf:wg:oauth:2.0:oob')
+    app = Doorkeeper::Application.create!(name: app_name, confidential: false)
     puts "\tApp Id: #{app.uid}"
     puts
   end

@@ -19,7 +19,7 @@ Doorkeeper.configure do
 
   grant_flows %w[password]
 
-  allow_blank_redirect_uri false
+  allow_blank_redirect_uri true
 
   api_only
 

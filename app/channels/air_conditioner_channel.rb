@@ -1,6 +1,6 @@
 class AirConditionerChannel < ApplicationCable::Channel
   def subscribed
-    # stream_from "some_channel"
+    stream_from "air_conditioner_channel"
   end
 
   def unsubscribed

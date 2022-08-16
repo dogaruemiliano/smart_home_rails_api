@@ -10,7 +10,9 @@ class Api::V1::AirConditionersController < ApplicationController
   def toggle_power
     authorize @air_conditioner, :controll?
 
-    render_ac_error_message unless @air_conditioner.update!(on: !@air_conditioner.on)
+    @air_conditioner.update!(on: !@air_conditioner.on)
+    ActionCable.server.broadcast('air_conditioner_channel', { method: 'toggle_power', state: @air_conditioner.to_hash })
+
     render :show
   end
 
@@ -19,6 +21,8 @@ class Api::V1::AirConditionersController < ApplicationController
 
     @mode = Mode.where(mode: @air_conditioner.mode).first
     if @mode.raise_temp == true
+      ActionCable.server.broadcast('air_conditioner_channel',
+                                   { method: 'raise_temperature', state: @air_conditioner.to_hash })
       render :show
     else
       render_mode_error_message
@@ -30,6 +34,9 @@ class Api::V1::AirConditionersController < ApplicationController
 
     @mode = Mode.where(mode: @air_conditioner.mode).first
     if @mode.lower_temp == true
+      ActionCable.server.broadcast('air_conditioner_channel',
+                                   { method: 'lower_temperature', state: @air_conditioner.to_hash })
+
       render :show
     else
       render_mode_error_message
@@ -43,7 +50,9 @@ class Api::V1::AirConditionersController < ApplicationController
 
     authorize @air_conditioner, :controll?
 
-    render_ac_error_message unless @air_conditioner.update(mode: next_mode)
+    @air_conditioner.update(mode: next_mode)
+    ActionCable.server.broadcast('air_conditioner_channel', { method: 'change_mode', state: @air_conditioner.to_hash })
+
     render :show
   end
 
@@ -54,7 +63,9 @@ class Api::V1::AirConditionersController < ApplicationController
 
     authorize @air_conditioner, :controll?
 
-    render_ac_error_message unless @air_conditioner.update(fan_speed: next_fan_speed)
+    @air_conditioner.update(fan_speed: next_fan_speed)
+    ActionCable.server.broadcast('air_conditioner_channel', { method: 'change_fan_speed', state: @air_conditioner.to_hash })
+
     render :show
   end
 

@@ -14,6 +14,21 @@ class AirConditioner < ApplicationRecord
     modes.where(mode:).first.temperature
   end
 
+  def to_hash
+    {
+      power: on,
+      fanSpeed: fan_speed,
+      mode: mode,
+      temperatures: {
+        auto: modes.where(mode: 'auto').first.temperature,
+        heat: modes.where(mode: 'heat').first.temperature,
+        cool: modes.where(mode: 'cool').first.temperature,
+        dry: modes.where(mode: 'dry').first.temperature,
+        fan: modes.where(mode: 'fan').first.temperature,
+      }
+    }
+    end
+
   # def to_builder
   #   Jbuilder.new do |air_conditioner|
   #     air_conditioner.name name

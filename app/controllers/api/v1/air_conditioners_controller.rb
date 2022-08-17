@@ -2,8 +2,6 @@ class Api::V1::AirConditionersController < ApplicationController
   before_action :set_air_conditioner
 
   def get_state
-    authorize @air_conditioner
-
     render :show
   end
 

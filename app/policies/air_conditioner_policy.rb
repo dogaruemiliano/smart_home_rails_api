@@ -6,10 +6,6 @@ class AirConditionerPolicy < ApplicationPolicy
   #   # end
   # end
 
-  def get_state?
-    true
-  end
-
   def controll?
     if record.owner_only
       user == record.user

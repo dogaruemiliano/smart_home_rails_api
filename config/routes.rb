@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
-      get '/ac', to: 'air_conditioners#get_state'
+      get '/ac', to: 'air_conditioners#show'
       post '/toggle_power', to: 'air_conditioners#toggle_power'
       post '/raise_temperature', to: 'air_conditioners#raise_temperature'
       post '/lower_temperature', to: 'air_conditioners#lower_temperature'

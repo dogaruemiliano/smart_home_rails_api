@@ -1,29 +1,20 @@
 class Api::V1::AirConditionersController < ApplicationController
   before_action :set_air_conditioner
+  before_action :check_authorize, except: :get_state
+  before_action :set_mode, only: %i[raise_temperature lower_temperature]
 
-  def get_state
-    render :show
-  end
+  def show; end
 
   def toggle_power
-    authorize @air_conditioner, :controll?
-
     @air_conditioner.update!(on: !@air_conditioner.on)
-    ActionCable.server.broadcast('air_conditioner_channel',
-                                 { user: current_user.username, method: 'toggle_power',
-                                   state: @air_conditioner.to_hash })
+    broadcast_message 'toggle_power'
 
     render :show
   end
 
   def raise_temperature
-    authorize @air_conditioner, :controll?
-
-    @mode = Mode.where(mode: @air_conditioner.mode).first
-    if @mode.raise_temp == true
-      ActionCable.server.broadcast('air_conditioner_channel',
-                                   { user: current_user.username, method: 'raise_temperature',
-                                     state: @air_conditioner.to_hash })
+    if @mode.raise_temp
+      broadcast_message 'raise_temperature'
       render :show
     else
       render_mode_error_message
@@ -31,14 +22,8 @@ class Api::V1::AirConditionersController < ApplicationController
   end
 
   def lower_temperature
-    authorize @air_conditioner, :controll?
-
-    @mode = Mode.where(mode: @air_conditioner.mode).first
-    if @mode.lower_temp == true
-      ActionCable.server.broadcast('air_conditioner_channel',
-                                   { user: current_user.username, method: 'lower_temperature',
-                                     state: @air_conditioner.to_hash })
-
+    if @mode.lower_temp
+      broadcast_message 'lower_temperature'
       render :show
     else
       render_mode_error_message
@@ -46,32 +31,15 @@ class Api::V1::AirConditionersController < ApplicationController
   end
 
   def change_mode
-    current_index = AirConditioner::MODES.find_index(@air_conditioner.mode)
-    next_index = (current_index + 1) % AirConditioner::MODES.size
-    next_mode = AirConditioner::MODES[next_index]
-
-    authorize @air_conditioner, :controll?
-
-    @air_conditioner.update(mode: next_mode)
-    binding.pry
-    ActionCable.server.broadcast('air_conditioner_channel',
-                                 { user: current_user.username, method: 'change_mode',
-                                   state: @air_conditioner.to_hash })
+    @air_conditioner.change_mode
+    broadcast_message 'change_mode'
 
     render :show
   end
 
   def change_fan_speed
-    current_index = AirConditioner::FAN_SPEEDS.find_index(@air_conditioner.fan_speed)
-    next_index = (current_index + 1) % AirConditioner::FAN_SPEEDS.size
-    next_fan_speed = AirConditioner::FAN_SPEEDS[next_index]
-
-    authorize @air_conditioner, :controll?
-
-    @air_conditioner.update(fan_speed: next_fan_speed)
-    ActionCable.server.broadcast('air_conditioner_channel',
-                                 { user: current_user.username, method: 'change_fan_speed',
-                                   state: @air_conditioner.to_hash })
+    @air_conditioner.change_fan_speed
+    broadcast_message 'change_fan_speed'
 
     render :show
   end
@@ -80,6 +48,20 @@ class Api::V1::AirConditionersController < ApplicationController
 
   def set_air_conditioner
     @air_conditioner = AirConditioner.first
+  end
+
+  def set_mode
+    @mode = Mode.get_by(mode: @air_conditioner.mode)
+  end
+
+  def broadcast_message(method)
+    ActionCable.server.broadcast('air_conditioner_channel',
+                                 { user: current_user.username, method:,
+                                   state: @air_conditioner.to_hash })
+  end
+
+  def check_authorize
+    authorize @air_conditioner, :controll?
   end
 
   def render_mode_error_message

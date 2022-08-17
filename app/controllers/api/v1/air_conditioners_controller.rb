@@ -1,7 +1,6 @@
 class Api::V1::AirConditionersController < ApplicationController
   before_action :set_air_conditioner
-  before_action :check_authorize, except: :get_state
-  before_action :set_mode, only: %i[raise_temperature lower_temperature]
+  before_action :check_authorize, except: :show
 
   def show; end
 
@@ -13,45 +12,55 @@ class Api::V1::AirConditionersController < ApplicationController
   end
 
   def raise_temperature
-    if @mode.raise_temp
-      broadcast_message 'raise_temperature'
-      render :show
+    if @air_conditioner.mode == 'fan'
+      render json: { message: "Can't change temperature on FAN mode" }
     else
-      render_mode_error_message
+      @air_conditioner.change_temp 1
+      if @air_conditioner.save
+        broadcast_message 'raise_temperature'
+        render :show
+      else
+        render_error_message
+      end
     end
   end
 
   def lower_temperature
-    if @mode.lower_temp
-      broadcast_message 'lower_temperature'
-      render :show
+    if @air_conditioner.mode == 'fan'
+      render json: { message: "Can't change temperature on FAN mode" }
     else
-      render_mode_error_message
+      @air_conditioner.change_temp(-1)
+      if @air_conditioner.save
+        broadcast_message 'lower_temperature'
+        render :show
+      else
+        render_error_message
+      end
     end
   end
 
   def change_mode
-    @air_conditioner.change_mode
-    broadcast_message 'change_mode'
-
-    render :show
+    if @air_conditioner.change_mode!
+      broadcast_message 'change_mode'
+      render :show
+    else
+      render_error_message
+    end
   end
 
   def change_fan_speed
-    @air_conditioner.change_fan_speed
-    broadcast_message 'change_fan_speed'
-
-    render :show
+    if @air_conditioner.change_fan_speed!
+      broadcast_message 'change_fan_speed'
+      render :show
+    else
+      render_error_message
+    end
   end
 
   private
 
   def set_air_conditioner
     @air_conditioner = AirConditioner.first
-  end
-
-  def set_mode
-    @mode = Mode.get_by(mode: @air_conditioner.mode)
   end
 
   def broadcast_message(method)
@@ -64,12 +73,7 @@ class Api::V1::AirConditionersController < ApplicationController
     authorize @air_conditioner, :controll?
   end
 
-  def render_mode_error_message
-    render json: { errors: 'Something happened',
-                   messages: "Can't lower or raise temperature because your reached the limit" }
-  end
-
-  def render_ac_error_message
+  def render_error_message
     render json: { errors: 'Something happened', messages: @air_conditioner.errors.full_messages }
   end
 end

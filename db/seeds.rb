@@ -18,14 +18,14 @@ end
 
 puts '=' * 79
 
-User.first_or_create!(username: 'User1',
+User.first_or_create!(username: 'user1',
                       password: 'admin123@',
                       password_confirmation: 'admin123@',
                       role: User.roles[:admin])
 
 puts "User: #{User.first.username} exists or was created"
 
-User.second || User.create!(username: 'User2',
+User.second || User.create!(username: 'user2',
                             password: 'admin123@',
                             password_confirmation: 'admin123@',
                             role: User.roles[:admin])
@@ -34,37 +34,9 @@ puts "User: #{User.second.username} exists or was created"
 
 puts '=' * 79
 
-ac = AirConditioner.first_or_create!(user: User.first, name: 'apartament', on: true, fan_speed: 'medium',
-                                     mode: 'cool', owner_only: false)
+AirConditioner.first_or_create!(user: User.first, name: 'apartament', on: true, fan_speed: 'medium',
+                                     mode: 'cool', temperature: 20, owner_only: false)
 puts "AirConditioner 'apartament' was created or existed"
-
-puts '=' * 79
-
-if Mode.where(mode: 'auto').empty?
-  Mode.create!(air_conditioner: ac, mode: 'auto', temperature: 20, min_temperature: 17,
-               max_temperature: 30)
-end
-puts "Mode #{Mode.last.mode} was created or existed"
-if Mode.where(mode: 'heat').empty?
-  Mode.create!(air_conditioner: ac, mode: 'heat', temperature: 20, min_temperature: 17,
-               max_temperature: 28)
-end
-puts "Mode #{Mode.last.mode} was created or existed"
-if Mode.where(mode: 'cool').empty?
-  Mode.create!(air_conditioner: ac, mode: 'cool', temperature: 19, min_temperature: 19,
-               max_temperature: 30)
-end
-puts "Mode #{Mode.last.mode} was created or existed"
-if Mode.where(mode: 'dry').empty?
-  Mode.create!(air_conditioner: ac, mode: 'dry', temperature: 20, min_temperature: 19,
-               max_temperature: 30)
-end
-puts "Mode #{Mode.last.mode} was created or existed"
-if Mode.where(mode: 'fan').empty?
-  Mode.create!(air_conditioner: ac, mode: 'fan', temperature: 0, min_temperature: 0,
-               max_temperature: 0)
-end
-puts "Mode #{Mode.last.mode} was created or existed"
 
 puts '=' * 79
 puts '=' * 79

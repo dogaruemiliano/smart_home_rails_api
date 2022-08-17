@@ -1,8 +1,8 @@
 class ApplicationController < ActionController::API
   include Pundit::Authorization
 
-  before_action :doorkeeper_authorize!, except: :get_state
-  after_action :verify_authorized, except: :get_state
+  before_action :doorkeeper_authorize!, except: :show
+  after_action :verify_authorized, except: :show
   after_action :verify_policy_scoped, only: :index
 
   def current_user

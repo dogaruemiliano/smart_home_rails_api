@@ -10,31 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_08_16_011701) do
+ActiveRecord::Schema[7.0].define(version: 2022_08_16_010528) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "air_conditioners", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.boolean "owner_only", null: false
+    t.boolean "owner_only", default: false, null: false
     t.string "name", null: false
     t.boolean "on", null: false
     t.string "fan_speed", null: false
     t.string "mode", null: false
+    t.integer "temperature"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_air_conditioners_on_user_id"
-  end
-
-  create_table "modes", force: :cascade do |t|
-    t.bigint "air_conditioner_id", null: false
-    t.string "mode", null: false
-    t.integer "temperature"
-    t.integer "max_temperature"
-    t.integer "min_temperature"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["air_conditioner_id"], name: "index_modes_on_air_conditioner_id"
   end
 
   create_table "oauth_access_tokens", force: :cascade do |t|
@@ -78,6 +68,5 @@ ActiveRecord::Schema[7.0].define(version: 2022_08_16_011701) do
   end
 
   add_foreign_key "air_conditioners", "users"
-  add_foreign_key "modes", "air_conditioners"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
 end

@@ -17,7 +17,7 @@ Doorkeeper.configure do
     User.authenticate(params[:username], params[:password])
   end
 
-  grant_flows %w[password]
+  grant_flows %w[password refresh_token]
 
   allow_blank_redirect_uri true
 
@@ -26,6 +26,9 @@ Doorkeeper.configure do
   base_controller 'ActionController::API'
 
   use_refresh_token
+  
+  # revoke_previous_client_credentials_token
+
 
   # If you didn't skip applications controller from Doorkeeper routes in your application routes.rb
   # file then you need to declare this block in order to restrict access to the web interface for

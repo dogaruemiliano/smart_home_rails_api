@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  has_many :air_conditioner, dependent: :destroy
   validates :username, presence: true, uniqueness: true
   validates :password, presence: true
 

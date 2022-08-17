@@ -1,6 +1,6 @@
 class AirConditioner < ApplicationRecord
   belongs_to :user
-  has_many :modes
+  has_many :modes, dependent: :destroy
 
   validates :name, presence: true
   validates :on, inclusion: [true, false]

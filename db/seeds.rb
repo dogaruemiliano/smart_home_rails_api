@@ -18,12 +18,19 @@ end
 
 puts '=' * 79
 
-User.first_or_create!(username: 'Username#1',
+User.first_or_create!(username: 'User1',
                       password: 'admin123@',
                       password_confirmation: 'admin123@',
                       role: User.roles[:admin])
 
 puts "User: #{User.first.username} exists or was created"
+
+User.second || User.create!(username: 'User2',
+                            password: 'admin123@',
+                            password_confirmation: 'admin123@',
+                            role: User.roles[:admin])
+
+puts "User: #{User.second.username} exists or was created"
 
 puts '=' * 79
 

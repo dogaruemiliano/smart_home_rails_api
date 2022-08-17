@@ -9,7 +9,9 @@ class Api::V1::AirConditionersController < ApplicationController
     authorize @air_conditioner, :controll?
 
     @air_conditioner.update!(on: !@air_conditioner.on)
-    ActionCable.server.broadcast('air_conditioner_channel', { method: 'toggle_power', state: @air_conditioner.to_hash })
+    ActionCable.server.broadcast('air_conditioner_channel',
+                                 { user: params[:user], method: 'toggle_power',
+                                   state: @air_conditioner.to_hash })
 
     render :show
   end
@@ -20,7 +22,8 @@ class Api::V1::AirConditionersController < ApplicationController
     @mode = Mode.where(mode: @air_conditioner.mode).first
     if @mode.raise_temp == true
       ActionCable.server.broadcast('air_conditioner_channel',
-                                   { method: 'raise_temperature', state: @air_conditioner.to_hash })
+                                   { user: params[:user], method: 'raise_temperature',
+                                     state: @air_conditioner.to_hash })
       render :show
     else
       render_mode_error_message
@@ -33,7 +36,8 @@ class Api::V1::AirConditionersController < ApplicationController
     @mode = Mode.where(mode: @air_conditioner.mode).first
     if @mode.lower_temp == true
       ActionCable.server.broadcast('air_conditioner_channel',
-                                   { method: 'lower_temperature', state: @air_conditioner.to_hash })
+                                   { user: params[:user], method: 'lower_temperature',
+                                     state: @air_conditioner.to_hash })
 
       render :show
     else
@@ -49,7 +53,11 @@ class Api::V1::AirConditionersController < ApplicationController
     authorize @air_conditioner, :controll?
 
     @air_conditioner.update(mode: next_mode)
-    ActionCable.server.broadcast('air_conditioner_channel', { method: 'change_mode', state: @air_conditioner.to_hash })
+    puts params[:user]
+    puts params["user"]
+    ActionCable.server.broadcast('air_conditioner_channel',
+                                 { user: params[:user], method: 'change_mode',
+                                   state: @air_conditioner.to_hash })
 
     render :show
   end
@@ -62,7 +70,9 @@ class Api::V1::AirConditionersController < ApplicationController
     authorize @air_conditioner, :controll?
 
     @air_conditioner.update(fan_speed: next_fan_speed)
-    ActionCable.server.broadcast('air_conditioner_channel', { method: 'change_fan_speed', state: @air_conditioner.to_hash })
+    ActionCable.server.broadcast('air_conditioner_channel',
+                                 { user: params[:user], method: 'change_fan_speed',
+                                   state: @air_conditioner.to_hash })
 
     render :show
   end

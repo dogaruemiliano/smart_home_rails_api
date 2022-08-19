@@ -74,6 +74,7 @@ class Api::V1::AirConditionersController < ApplicationController
   end
 
   def render_error_message
-    render json: { errors: 'Something happened', messages: @air_conditioner.errors.full_messages }
+    render json: { errors: 'Something happened', messages: @air_conditioner.errors.full_messages },
+           status: :unprocessable_entity
   end
 end

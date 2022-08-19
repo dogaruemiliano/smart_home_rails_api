@@ -65,7 +65,7 @@ class Api::V1::AirConditionersController < ApplicationController
 
   def broadcast_message(method)
     ActionCable.server.broadcast('air_conditioner_channel',
-                                 { user: current_user.username, method:,
+                                 { component: "ac", user: current_user.username, method:,
                                    state: @air_conditioner.to_hash })
   end
 
